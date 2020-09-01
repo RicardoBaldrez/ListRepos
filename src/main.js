@@ -33,6 +33,7 @@ class App {
         const inputValue = this.inputElement.value;
 
         if (inputValue.length === 0) {
+            alert('Digite o repositório para buscar!!!');
             return;
         }
 
@@ -44,9 +45,9 @@ class App {
             const {
                 name,
                 description,
+                html_url,
                 owner: {
                     avatar_url,
-                    html_url
                 }
             } = response.data;
 
@@ -92,7 +93,7 @@ class App {
 
             let linkElement = document.createElement('a');
             linkElement.setAttribute('href', repo.html_url);
-            linkElement.setAttribute('_target', '_blank');
+            linkElement.setAttribute('target', '_blank');
             linkElement.appendChild(document.createTextNode('Acessar'));
 
             let listItemElement = document.createElement('li');
