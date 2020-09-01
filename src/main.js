@@ -15,6 +15,18 @@ class App {
         this.formElement.onsubmit = event => this.addRepository(event);
     }
 
+    setLoading(loading = true) {
+        if (loading === true) {
+            let loadElement = document.createElement('p');
+            loadElement.appendChild(document.createTextNode('Carregando ...'));
+            loadElement.setAttribute('id', 'loading');
+
+            this.formElement.appendChild(loadElement);
+        } else {
+            document.getElementById('loading').remove();
+        }
+    }
+
     async addRepository(event) {
         event.preventDefault();
 
@@ -24,29 +36,45 @@ class App {
             return;
         }
 
-        const response = await api.get(`/repos/${inputValue}`);
+        this.setLoading();
 
-        const {
-            name,
-            description,
-            owner: {
-                avatar_url,
-                html_url
-            }
-        } = response.data;
+        try {
+            const response = await api.get(`/repos/${inputValue}`);
 
-        this.repositories.push(
-            {
+            const {
                 name,
                 description,
-                avatar_url,
-                html_url
-            }
-        );
+                owner: {
+                    avatar_url,
+                    html_url
+                }
+            } = response.data;
 
-        this.inputElement.value = '';
+            this.repositories.push(
+                {
+                    name,
+                    description,
+                    avatar_url,
+                    html_url
+                }
+            );
 
-        this.render();
+            this.inputElement.value = '';
+
+            this.render()
+
+        } catch (error) {
+            // alert(`O repositório ${inputValue} não existe!!!`);
+            this.listElement.innerHTML = '';
+
+            let listItemElement = document.createElement('li');
+            listItemElement.style.color = 'red';
+            listItemElement.style.fontWeight = 'bold';
+            listItemElement.appendChild(document.createTextNode(`O repositório '${inputValue}' não existe!!!`));
+            this.listElement.appendChild(listItemElement);
+        };
+
+        this.setLoading(false);
     }
 
     render() {
