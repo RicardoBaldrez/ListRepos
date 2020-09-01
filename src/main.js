@@ -1,8 +1,11 @@
+import api from './api';
+
 class App {
     constructor() {
         this.repositories = [];
 
         this.formElement = document.getElementById('repo-form');
+        this.inputElement = document.querySelector('input[name=repository]')
         this.listElement = document.getElementById('repo-list');
 
         this.registerHandlers();
@@ -12,17 +15,36 @@ class App {
         this.formElement.onsubmit = event => this.addRepository(event);
     }
 
-    addRepository(event) {
+    async addRepository(event) {
         event.preventDefault();
+
+        const inputValue = this.inputElement.value;
+
+        if (inputValue.length === 0) {
+            return;
+        }
+
+        const response = await api.get(`/repos/${inputValue}`);
+
+        const {
+            name,
+            description,
+            owner: {
+                avatar_url,
+                html_url
+            }
+        } = response.data;
 
         this.repositories.push(
             {
-                name: 'rocketseat.com.br',
-                description: 'Tire a sua ideia do papel, e de vida a sua startup.',
-                avatar_url: 'https://avatars0.githubusercontent.com/u/28929274?v=4',
-                html_url: 'http://github.com/rocketseat/rocketseat.com.br'
+                name,
+                description,
+                avatar_url,
+                html_url
             }
         );
+
+        this.inputElement.value = '';
 
         this.render();
     }
